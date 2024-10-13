@@ -1,0 +1,79 @@
+Step-by-Step Setup:
+
+1. Create a Git Repository for Config Files
+Create a new public or private repository on GitHub.
+Structure the repository like this:
+
+config-repo/
+├── app1/
+│   └── application.properties
+├── app2/
+│   └── application.properties
+├── app3/
+│   └── application.properties
+├── app4/
+│   └── application.properties
+└── app5/
+    └── application.properties
+
+Push the repository to GitHub.
+
+
+2. Set Up the Spring Cloud Config Server
+Create a new Spring Boot project from https://start.spring.io/:
+
+Add the following dependencies:
+Spring Boot DevTools
+Config Server
+Spring Web
+Modify application.properties in the Config Server:
+
+properties
+server.port=8888
+spring.cloud.config.server.git.uri=https://github.com/your-username/config-repo
+spring.cloud.config.server.git.clone-on-start=true
+
+
+Enable the Config Server by adding the following annotation to your main class:
+
+import org.springframework.cloud.config.server.EnableConfigServer;
+
+@SpringBootApplication
+@EnableConfigServer
+public class ConfigServerApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(ConfigServerApplication.class, args);
+    }
+}
+Run the Config Server:
+
+Navigate to the project directory and run the application:
+
+The server will start on http://localhost:8888.
+3. Modify Your Applications to Use the Config Server
+In each application’s application.properties:
+
+spring.config.import=optional:configserver:http://localhost:8888
+spring.application.name=app1
+
+Profiles and Folder Mapping:
+The app1 folder in your Git repo corresponds to app1 configuration.
+On startup, the application will try to fetch the config from:
+
+http://localhost:8888/app1/default
+
+
+4. Start Your Application
+When the application starts, it will fetch the properties dynamically from the Config Server.
+You can also specify profiles:
+
+http://localhost:8888/app1/dev
+
+Private Git Repository:
+If your repo is private, add the following properties in the Config Server’s application.properties:
+properties
+Copy code
+spring.cloud.config.server.git.username=your-username
+spring.cloud.config.server.git.password=your-password
+Enable Spring Boot Actuator (for refresh support): Add the following dependency to your app’s pom.xml:
+
